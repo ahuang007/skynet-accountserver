@@ -22,7 +22,7 @@
   1. 注册
   - 请求数据示例：
     ```json
-      {"cmd":"register", "appid":1, data:{"account":"test001", "password":"123456"}} 
+      {"cmd":"register", "appid":1, "data":{"account":"test001", "password":"123456"}} 
     ```
     - 参数说明：
     ```
@@ -44,7 +44,7 @@
   2. 登录
  - 请求数据示例： 
     ```
-      {"cmd":"login", "appid":1, data:{"account":"test001", "password":"123456"}} 
+      {"cmd":"login", "appid":1, "data":{"account":"test001", "password":"123456"}} 
     ```
     - 参数说明：
     ```
@@ -67,7 +67,7 @@
     3. 修改密码（需要先登录 需要session）
     - 请求数据示例：(新密码需要前端2次确认)
     ```
-      {"cmd":"modifyPassword", "appid":1, data:{"oldPassword":"123456", "newPassword":"111111"}}
+      {"cmd":"modifyPassword", "appid":1, "data":{"oldPassword":"123456", "newPassword":"111111"}}
     ```
     - 参数说明：
     ```
