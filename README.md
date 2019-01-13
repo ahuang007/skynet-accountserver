@@ -6,35 +6,35 @@
   - 支持http请求+json数据
   - 存储用redis
   - 提供如下功能：
-  1. 注册
-  2. 登录
-  3. 修改密码
-  4. 提交用户数据
-    * 用户数据可以的json或者其他任何格式个序列化字符串，如果不想明文可以加密
-    * 限制数据的大小 预计不超过1M
-    * 存储示例如下：
-    ```
-      account: 账号
-      password：密码
-      email:邮箱(可以不填,用于找回密码)
-      phone:手机号(可以不填，用于找回密码)
-      userdata:{
-          nickname:昵称
-          gender:性别
-          diamond:钻石
-          lastLoginTime:上次登录时间
-          level：等级
-          exp:经验
-          activityData:{ 
-            [101] = true, // 101,102为活动id
-            [102] = {
-                playCount:活动已参与次数
+    * 注册
+    * 登录
+    * 修改密码
+    * 提交用户数据
+      * 用户数据可以的json或者其他任何格式个序列化字符串，如果不想明文可以加密
+      * 限制数据的大小 预计不超过1M
+      * 存储示例如下：
+      ```
+        account: 账号
+        password：密码
+        email:邮箱(可以不填,用于找回密码)
+        phone:手机号(可以不填，用于找回密码)
+        userdata:{
+            nickname:昵称
+            gender:性别
+            diamond:钻石
+            lastLoginTime:上次登录时间
+            level：等级
+            exp:经验
+            activityData:{ 
+              [101] = true, // 101,102为活动id
+              [102] = {
+                  playCount:活动已参与次数
+              }
             }
-          }
-          等等        
-      }
-      【userdata自己组织 以上仅为示例】  
-    ```
+            等等        
+        }
+        【userdata自己组织 以上仅为示例】  
+      ```
 * 每个游戏参数[需要申请,不同游戏之间不能影响]
   - appid: 游戏id
   - appkey: 用来加密的key
