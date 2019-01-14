@@ -1,0 +1,6 @@
+#!/bin/sh
+
+ACCOUNT_ON=true
+
+GAME_EXIT_PORT=7210
+SSH_PORT=22
