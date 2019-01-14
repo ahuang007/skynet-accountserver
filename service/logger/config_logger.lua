@@ -8,19 +8,28 @@ local config = {}
 --业务日志
 config.log_index =
 {
-    LOG_COMMIT     = 1, -- 提交排行数据
+    LOG_REGISTER        = 1, -- 注册
+    LOG_LOGIN           = 2, -- 登录
+    LOG_MODIFYPASSWORD  = 3, -- 修改密码
+    LOG_COMMITUSERDATA  = 4, -- 提交用户数据
 }
 
 --业务日志对应服务名
 config.service_name =
 {
-    [config.log_index.LOG_COMMIT]    = ".rank_commit",
+    [config.log_index.LOG_REGISTER]         = ".account_register",
+    [config.log_index.LOG_LOGIN]            = ".account_login",
+    [config.log_index.LOG_MODIFYPASSWORD]   = ".account_modifypassword",
+    [config.log_index.LOG_COMMITUSERDATA]   = ".account_commituserdata",
 }
 
 -- 游戏逻辑服务
 config.local_service =
 {
-    [config.log_index.LOG_COMMIT]   = ".rank_commit busilog commit",
+    [config.log_index.LOG_REGISTER]         = ".account_register busilog register",
+    [config.log_index.LOG_LOGIN]            = ".account_login busilog login",
+    [config.log_index.LOG_MODIFYPASSWORD]   = ".account_modifypassword busilog modifypassword",
+    [config.log_index.LOG_COMMITUSERDATA]   = ".account_commituserdata busilog commituserdata",
 }
 
 return config

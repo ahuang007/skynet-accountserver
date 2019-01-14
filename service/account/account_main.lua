@@ -15,7 +15,7 @@ skynet.start(function ()
     skynet.send(local_logger,"lua", "init")
 
     local accountservice = skynet.newservice("accountservice")
-    skynet.name(".rankservice", accountservice)
+    skynet.name(".accountservice", accountservice)
     skynet.call(accountservice, "lua", "init")
     skynet.name(".account_web", skynet.newservice("account_web"))
 

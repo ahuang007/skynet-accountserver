@@ -15,17 +15,17 @@ TMP=$PATH
 PATH=$TMP
 
 CUR_PATH=$(dirname $(readlink -f $0))
-PID_FILE=$CUR_PATH/rank.pid
+PID_FILE=$CUR_PATH/account.pid
 
 if [ -z "$3" ]; then
-  CONFIG=$CUR_PATH/config.rank
+  CONFIG=$CUR_PATH/config.account
 else
   CONFIG=$CUR_PATH/$3
 fi
 
 #后台启动
 function back(){
-  echo -n $"Starting rankserver: "
+  echo -n $"Starting accountserver: "
   $CUR_PATH/../skynet/skynet $CONFIG
   if [ $? -eq 0 ]; then
     success && echo
@@ -36,7 +36,7 @@ function back(){
 
 #前台启动
 function view(){
-  debug_cfg=$CUR_PATH/debug_cfg.rank
+  debug_cfg=$CUR_PATH/debug_cfg.account
   sed -e 's/^logger/--logger/' -e 's/daemon/--daemon/' $CONFIG > $debug_cfg
   $CUR_PATH/../skynet/skynet $debug_cfg
 }
@@ -44,7 +44,7 @@ function view(){
 function start(){
   case "$MODE" in
     release)
-    #sh sh/log_name.sh rank
+    #sh sh/log_name.sh account
       back
       ;;
     debug)
@@ -58,17 +58,17 @@ function start(){
 
 function stop(){
   if [ ! -f $PID_FILE ] ;then
-    echo "not found pid file have no rankserver"
+    echo "not found pid file have no accountserver"
     exit 0
   fi
 
   pid=`cat $PID_FILE`
   exist_pid=`pgrep skynet | grep $pid`
   if [ -z "$exist_pid" ] ;then
-    echo "have no rankserver"
+    echo "have no accountserver"
     exit 0
   else
-    echo -n $"$pid rankserver will killed"
+    echo -n $"$pid accountserver will killed"
     killproc -p $PID_FILE
     echo
   fi

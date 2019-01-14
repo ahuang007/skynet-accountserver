@@ -4,9 +4,9 @@ bootstrap = "snlua bootstrap"
 cpath     = "skynet/cservice/?.so;luaclib/?.so;"
 
 harbor    = 0
-logger    = "./log/rank.log"
-daemon    = './sh/rank.pid'
-start     = "rank_main"
+logger    = "./log/account.log"
+daemon    = './sh/account.pid'
+start     = "account_main"
 
 local function concat(args)
   local r = ''
