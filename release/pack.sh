@@ -61,7 +61,7 @@ else
     mkdir -p $BUILD_DIR
 fi
 
-tar -czf $BUILD_DIR/rankserver-"$DATE".tar.gz *
+tar -czf $BUILD_DIR/accountserver-"$DATE".tar.gz *
 
 rm -rf $DEST_DIR
 
