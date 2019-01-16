@@ -14,6 +14,8 @@ local json          = require "json"
 local settings      = require 'settings'
 local crypt         = require 'crypt'
 local md5           = require 'md5'
+local redisx        = require 'redisx'
+local uuid          = require 'uuid'
 
 require "logger_api"
 
@@ -38,13 +40,13 @@ end
 ip:192.168.1.201
 port: 9100
 1 注册账号 http://192.168.1.201:9100/register?
-    {"cmd":"register", "appid":1, data:{"uid":1001, "name":"andy", "headIcon":"", "score":99}
+    {"cmd":"register", "appid":1, data:{"account":"test001", "password":"123456", "email":"pony@qq.com", "phone":15012345678}
 2 账号登录 http://192.168.1.201:9100/login?
-    {"cmd":"login", "appid":1, data:{"uid":1001, "startindex":1, "endindex":100}
+    {"cmd":"login", "appid":1, data:{"account":"test001", "password":"123456"}
 3 修改密码 http://192.168.1.201:9100/modifyPassword?
-    {"cmd":"modifyPassword", "appid":1}
+    {"cmd":"modifyPassword", "appid":1, "data":{"account":"test001", "session":"xxxx", "oldpassword":"123456", "newpassword":"111111"}}
 4 存储数据 http://192.168.1.201:9100/commitUserData?
-    {"cmd":"commitUserData", "appid":1}
+    {"cmd":"commitUserData", "appid":1, "data":{"account":"test001", "session":"xxxx", "userdata":"xxxxxx"}}
 
 -- 目前支持的http请求
 1 register
@@ -53,30 +55,32 @@ port: 9100
 4 commitUserData
 --]]
 
-local function handle_Register()
+local function handle_Register(req)
     local appid = req.appid
-    local platform = tonumber(req.platform)
-    local username = req.account
-    local password = req.password
-    local email = req.email or ""
-    local phone = req.phone or ""
+    local data = json.decode(req.data)
+    assert(data, "register data error")
+    local username = data.account
+    local password = data.password
+    local email = data.email
+    local phone = data.phone
 
     -- 账号不能为空
-    if not password or password == "" or not username or username == "" then
-        WARN("NULL username or password")
+    if (not password or password == "") or (not username or username == "") then
+        WARN("username or password is NULL")
         return {
-            status      = E.eRegisterRespStatus.RS_NULL_FAIlED,
-            errorMsg    = "account is empty",
+            status      = ErrorCode.params_failed[1],
+            errorMsg    = ErrorCode.params_failed[2],
         }
     end
 
     -- 账号已经存在
-    local p = redisx.hgettable(account_redis_key, platform_account)
-    if p then
-        WARN("User exist", p,p.account)
+    local db_name = "account_" .. appid
+    local tmpInfo = redisx.hgettable(db_name, username)
+    if tmpInfo then
+        WARN("User exist", username)
         return {
-            status      = E.eRegisterRespStatus.RS_EXIST_FAILED,
-            errorMsg    = "accout had exist",
+            status      = ErrorCode.account_had_exist[1],
+            errorMsg    = ErrorCode.account_had_exist[2],
         }
     end
 
@@ -84,11 +88,14 @@ local function handle_Register()
     local accountInfo = {
         account     = username,
         password    = password,
-        platform    = platform,
+        email       = email,
+        phone       = phone,
+        regtime     = os.time(),
+        userdata    = "",
     }
 
-    -- write 2 db
-    redisx.hsettable(account_redis_key, platform_account, accountInfo)
+    redisx.hsettable(db_name, username, accountInfo)
+    LOG_REGISTER(appid, username, password, email, phone)
 
     return {
         status      = ErrorCode.success[1],
@@ -96,15 +103,41 @@ local function handle_Register()
     }
 end
 
-local function handle_Login()
+local function handle_Login(req)
+    local appid = req.appid
+    local data = json.decode(req.data)
+    assert(data, "login data error")
+    local username = data.account
+    local password = data.password
+
+    local db_name = "account_" .. appid
+    local accountInfo = redisx.hgettable(db_name, username)
+    if not accountInfo then
+        return {
+            status      = ErrorCode.account_not_found[1],
+            errorMsg    = ErrorCode.account_not_found[2],
+        }
+    end
+
+    local session = uuid.new()
+    accountInfo.session = session
+    accountInfo.logintime = os.time()
+    redisx.hsettable(db_name, username, accountInfo)
+    LOG_LOGIN(appid, username, password)
+
+    return {
+        status      = ErrorCode.success[1],
+        errorMsg    = ErrorCode.success[2],
+        session     = session,
+        userdata    = accountInfo.userdata or "",
+    }
+end
+
+local function handle_ModifyPassword(req)
 
 end
 
-local function handle_ModifyPassword()
-
-end
-
-local function handle_CommitUserData()
+local function handle_CommitUserData(req)
 
 end
 

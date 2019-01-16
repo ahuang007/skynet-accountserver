@@ -6,13 +6,13 @@ local md5 = require "md5"
 local app_config = require "app_config"
 
 local M = {}
---[[
-local function commitdata_check(method, decode_data)
+
+local function check_register(method, decode_data)
     local keys = {
-        "uid",          -- uid
-        "name",     -- 物品类型
-        "headIcon",        -- 数值（物品为配置id 属性为数值）
-        "score",
+        "account",      -- 账号
+        "password",     -- 密码
+        --"email",        -- 邮箱(不是必须的)
+        --"phone",        -- 手机号(不是必须的)
     }
 
     for _,v in pairs(keys) do
@@ -21,14 +21,13 @@ local function commitdata_check(method, decode_data)
         end
     end
 
-    return {true, constant.REQ_TYPE.RT_COMMITDATA, decode_data}
+    return {true, constant.REQ_TYPE.RT_REGISTER, decode_data}
 end
 
-local function getranklist_check(method, decode_data)
+local function check_login(method, decode_data)
     local keys = {
-        "uid",
-        "startindex",
-        "endindex",
+        "account",
+        "password",
     }
     for _,v in pairs(keys) do
         if not decode_data[v] then
@@ -36,20 +35,37 @@ local function getranklist_check(method, decode_data)
         end
     end
 
-    return {true, constant.REQ_TYPE.RT_GETRANKLIST, decode_data}
+    return {true, constant.REQ_TYPE.RT_LOGIN, decode_data}
 end
 
-local function clearranklist_check(method, decode_data)
+local function check_modifypassword(method, decode_data)
     local keys = {
+        "account",
+        "session",
+        "oldpassword",
+        "newpassword",
     }
     for _,v in pairs(keys) do
         if not decode_data[v] then
             return {false, '缺少参数'}
         end
     end
-    return {true, constant.REQ_TYPE.ClearRankList, decode_data}
+    return {true, constant.REQ_TYPE.RT_MODIFYPASSWORD, decode_data}
 end
---]]
+
+local function check_commituserdata(method, decode_data)
+    local keys = {
+        "account",
+        "session",
+        "userdata",
+    }
+    for _,v in pairs(keys) do
+        if not decode_data[v] then
+            return {false, '缺少参数'}
+        end
+    end
+    return {true, constant.REQ_TYPE.RT_COMMITUSERDATA, decode_data}
+end
 
 local function decode_func(c)
     return string.char(tonumber(c, 16))
@@ -63,9 +79,10 @@ end
 --校验参数
 M.verify_data = function (method, res)
     local gmcmd = {
-        --CommitData      = commitdata_check(),
-        --GetRankList     = getranklist_check(),
-        --ClearRankList   = clearranklist_check(),
+        register        = check_register,
+        login           = check_login,
+        modifypassword  = check_modifypassword,
+        commituserdata  = check_commituserdata,
     }
 
     if not res.cmd or not gmcmd[res.cmd] then

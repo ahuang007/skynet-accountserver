@@ -10,6 +10,7 @@ local config_logger = require "logger.config_logger"
 local utils     = require "utils"
 local settings  = require "settings"
 local json      = require "cjson"
+local LOG_TYPE  = config_logger.log_index
 
 require "skynet.manager"
 require "logger_api"
@@ -30,34 +31,56 @@ skynet.register_protocol {
 local CMD = {}
 CMD.log_box = {}
 
-local function get_log_str(prefix, t)
-    return date.format(date.second()) .. "|" ..  prefix .. "|" .. json.encode(t)
+local function get_log_str(prefix, appid, t)
+    return date.format(date.second()) .. "|" ..  prefix .. "|" .. appid .. "|" .. json.encode(t)
 end
 
-function CMD.log(logtype, prefix, data)
+function CMD.log(logtype, prefix, appid, data)
     if not CMD.log_box[logtype] then
         skynet.error("cannot find bussiness by type: ", logtype)
         return
     end
-    local str = get_log_str(prefix, data)
+    local str = get_log_str(prefix, appid, data)
     skynet.send(config_logger.service_name[logtype], "busi_logger", str)
 end
 
--- 玩家在线日志(每5分钟写一次)
--- 参数说明
---[[
-playercount 在线玩家数量
-time        记录时间
-]]
-function CMD.log_commit(uid, name, headIcon, score)
+-- 玩家注册日志
+function CMD.log_register(appid, account, password, email, phone)
     local data = {
-        uid         = uid,
-        name        = name,
-        headIcon    = headIcon,
-        score       = score,
-        time        = os.time(),
+        account     = account,
+        password    = password,
+        email       = email or "",
+        phone       = phone or "",
     }
-    CMD.log(config_logger.log_index.LOG_COMMIT, 'commit', data)
+    CMD.log(LOG_TYPE.LOG_REGISTER, 'register', appid, data)
+end
+
+-- 玩家登录日志
+function CMD.log_login(appid, account, password)
+    local data = {
+        account     = account,
+        password    = password,
+    }
+    CMD.log(LOG_TYPE.LOG_LOGIN, 'login', appid, data)
+end
+
+-- 玩家修改密码日志
+function CMD.log_modifypassword(appid, account, oldpassword, newpassword)
+    local data = {
+        account     = account,
+        oldpassword = oldpassword,
+        newpassword = newpassword,
+    }
+    CMD.log(LOG_TYPE.LOG_MODIFYPASSWORD, 'modifypassword', appid, data)
+end
+
+-- 玩家提交用户数据日志
+function CMD.log_commituserdata(appid, account, data)
+    local data = {
+        account = account,
+        data    = data,
+    }
+    CMD.log(LOG_TYPE.LOG_COMMITUSERDATA, 'commituserdata', appid, data)
 end
 
 -- end business logger --

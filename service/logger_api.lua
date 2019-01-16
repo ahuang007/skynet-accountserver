@@ -9,9 +9,23 @@ local date      = require "date"
 
 _G.defaultLevel = constant.LOG_LEVEL.LOG_DEFAULT
 
--- 业务日志
-function LOG_COMMIT(...)
-    skynet.send(".local_logger","lua", "log_commit", ...)
+--- 业务日志
+
+-- 注册
+function LOG_REGISTER(...)
+    skynet.send(".local_logger","lua", "log_register", ...)
+end
+
+function LOG_LOGIN(...)
+    skynet.send(".local_logger","lua", "log_login", ...)
+end
+
+function LOG_MODIFYPASSWORD(...)
+    skynet.send(".local_logger","lua", "log_modifypassword", ...)
+end
+
+function LOG_COMMITUSERDATA(...)
+    skynet.send(".local_logger","lua", "log_commituserdata", ...)
 end
 
 -- 错误日志 --
