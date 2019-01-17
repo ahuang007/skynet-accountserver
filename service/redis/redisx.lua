@@ -95,10 +95,12 @@ function redisx.hsetnx(key,  field, value)
 end
 
 function redisx.incrby(key, increment)
+    increment = increment or 1
     return tonumber(skynet.call(REDIS, 'lua', 1, 'incrby', key, increment))
 end
 
 function redisx.hincrby(key, field, increment)
+    increment = increment or 1
     return tonumber(skynet.call(REDIS, 'lua', 1, 'hincrby', key, field, increment))
 end
 

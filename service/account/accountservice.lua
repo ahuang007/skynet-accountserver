@@ -10,12 +10,18 @@ local utils     = require 'utils'
 local sharedata = require "sharedata"
 local cluster   = require "cluster"
 local app_config = require "app_config"
+local redisx    = require "redisx"
 require "logger_api"
 
 local CMD           = {}
 
+-- uid 唯一
+local uid_key = "max_uid"
 function CMD.init()
     cluster.register("accountservice")
+    if not redisx.exists(uid_key) then
+        redisx.setstring(uid_key, math.random(10000, 99999))
+    end
 end
 
 skynet.start(function ()

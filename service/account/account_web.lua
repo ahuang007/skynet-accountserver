@@ -21,6 +21,7 @@ require "logger_api"
 
 local mode = ...
 local accountservice
+local uid_key = "max_uid"
 
 if mode == "agent" then
 
@@ -38,14 +39,14 @@ end
 --[[
 账号服文档
 ip:192.168.1.201
-port: 9100
-1 注册账号 http://192.168.1.201:9100/register?
+port: 9101
+1 注册账号 http://192.168.1.201:9101/register?
     {"cmd":"register", "appid":1, data:{"account":"test001", "password":"123456", "email":"pony@qq.com", "phone":15012345678}
-2 账号登录 http://192.168.1.201:9100/login?
+2 账号登录 http://192.168.1.201:9101/login?
     {"cmd":"login", "appid":1, data:{"account":"test001", "password":"123456"}
-3 修改密码 http://192.168.1.201:9100/modifyPassword?
+3 修改密码 http://192.168.1.201:9101/modifyPassword?
     {"cmd":"modifyPassword", "appid":1, "data":{"account":"test001", "session":"xxxx", "oldpassword":"123456", "newpassword":"111111"}}
-4 存储数据 http://192.168.1.201:9100/commitUserData?
+4 存储数据 http://192.168.1.201:9101/commitUserData?
     {"cmd":"commitUserData", "appid":1, "data":{"account":"test001", "session":"xxxx", "userdata":"xxxxxx"}}
 
 -- 目前支持的http请求
@@ -88,6 +89,7 @@ local function handle_Register(req)
     local accountInfo = {
         account     = username,
         password    = password,
+        uid         = redisx.incrby(uid_key),
         email       = email,
         phone       = phone,
         regtime     = os.time(),
@@ -129,16 +131,17 @@ local function handle_Login(req)
         status      = ErrorCode.success[1],
         errorMsg    = ErrorCode.success[2],
         session     = session,
+        uid         = accountInfo.uid,
         userdata    = accountInfo.userdata or "",
     }
 end
 
 local function handle_ModifyPassword(req)
-
+    -- todo:
 end
 
 local function handle_CommitUserData(req)
-
+    -- todo:
 end
 
 local http_req_tb = {
